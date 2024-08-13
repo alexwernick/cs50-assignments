@@ -63,6 +63,7 @@ while True:
                 time.sleep(0.2)
                 user = ttt.LETTER_O
 
+
     else:
         # Draw game board
         tile_size = 80
