@@ -2,7 +2,8 @@ import sys
 import time
 
 import pygame
-import tictactoe as ttt
+
+import cs50_assignments.search.tictactoe.tictactoe as ttt
 
 pygame.init()
 size = width, height = 600, 400
@@ -57,10 +58,11 @@ while True:
             mouse = pygame.mouse.get_pos()
             if playXButton.collidepoint(mouse):
                 time.sleep(0.2)
-                user = ttt.X
+                user = ttt.LETTER_X
             elif playOButton.collidepoint(mouse):
                 time.sleep(0.2)
-                user = ttt.O
+                user = ttt.LETTER_O
+
 
     else:
         # Draw game board
