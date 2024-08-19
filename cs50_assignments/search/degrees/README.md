@@ -1,7 +1,7 @@
 # Degrees
 The latest version of Python you should use in this course is Python 3.12.
 
-Write a program that determines how many “degrees of separation” apart two actors are.T
+Write a program that determines how many “degrees of separation” apart two actors are.
 
 ## Background
 According to the Six Degrees of Kevin Bacon game, anyone in the Hollywood film industry can be connected to Kevin Bacon within six steps, where each step consists of finding a film that two actors both starred in.
@@ -11,8 +11,9 @@ In this problem, we’re interested in finding the shortest path between any two
 We can frame this as a search problem: our states are people. Our actions are movies, which take us from one actor to another (it’s true that a movie could take us to multiple different actors, but that’s okay for this problem). Our initial state and goal state are defined by the two people we’re trying to connect. By using breadth-first search, we can find the shortest path from one actor to another.
 
 ## Getting Started
-Download the distribution code from https://cdn.cs50.net/ai/2023/x/projects/0/degrees.zip and unzip it.
-Understanding
+- Download the distribution code from https://cdn.cs50.net/ai/2023/x/projects/0/degrees.zip and unzip it.
+
+## Understanding
 The distribution code contains two sets of CSV data files: one set in the large directory and one set in the small directory. Each contains files with the same names, and the same structure, but small is a much smaller dataset for ease of testing and experimentation.
 
 Each dataset consists of three CSV files. A CSV file, if unfamiliar, is just a way of organizing data in a text-based format: each row corresponds to one data entry, with commas in the row separating the values for that entry.
@@ -32,9 +33,10 @@ The shortest_path function, however, is left unimplemented. That’s where you c
 ## Specification
 Complete the implementation of the shortest_path function such that it returns the shortest path from the person with id source to the person with the id target.
 
-Assuming there is a path from the source to the target, your function should return a list, where each list item is the next (movie_id, person_id) pair in the path from the source to the target. Each pair should be a tuple of two strings.
-For example, if the return value of shortest_path were [(1, 2), (3, 4)], that would mean that the source starred in movie 1 with person 2, person 2 starred in movie 3 with person 4, and person 4 is the target.
-If there are multiple paths of minimum length from the source to the target, your function can return any of them.
-If there is no possible path between two actors, your function should return None.
-You may call the neighbors_for_person function, which accepts a person’s id as input, and returns a set of (movie_id, person_id) pairs for all people who starred in a movie with a given person.
+- Assuming there is a path from the source to the target, your function should return a list, where each list item is the next (movie_id, person_id) pair in the path from the source to the target. Each pair should be a tuple of two strings.
+  - For example, if the return value of shortest_path were [(1, 2), (3, 4)], that would mean that the source starred in movie 1 with person 2, person 2 starred in movie 3 with person 4, and person 4 is the target.
+- If there are multiple paths of minimum length from the source to the target, your function can return any of them.
+- If there is no possible path between two actors, your function should return None.
+- You may call the neighbors_for_person function, which accepts a person’s id as input, and returns a set of (movie_id, person_id) pairs for all people who starred in a movie with a given person.
+
 You should not modify anything else in the file other than the shortest_path function, though you may write additional functions and/or import other Python standard library modules.
