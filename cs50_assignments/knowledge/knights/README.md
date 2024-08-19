@@ -1,50 +1,53 @@
-# Tic-Tac-Toe
+# Knights and Knaves
 The latest version of Python you should use in this course is Python 3.12.
 
-Using Minimax, implement an AI to play Tic-Tac-Toe optimally.
+Write a program to solve logic puzzles.
+
+## Background
+In 1978, logician Raymond Smullyan published “What is the name of this book?”, a book of logical puzzles. Among the puzzles in the book were a class of puzzles that Smullyan called “Knights and Knaves” puzzles.
+
+In a Knights and Knaves puzzle, the following information is given: Each character is either a knight or a knave. A knight will always tell the truth: if knight states a sentence, then that sentence is true. Conversely, a knave will always lie: if a knave states a sentence, then that sentence is false.
+
+The objective of the puzzle is, given a set of sentences spoken by each of the characters, determine, for each character, whether that character is a knight or a knave.
+
+For example, consider a simple puzzle with just a single character named A. A says “I am both a knight and a knave.”
+
+Logically, we might reason that if A were a knight, then that sentence would have to be true. But we know that the sentence cannot possibly be true, because A cannot be both a knight and a knave – we know that each character is either a knight or a knave, but not both. So, we could conclude, A must be a knave.
+
+That puzzle was on the simpler side. With more characters and more sentences, the puzzles can get trickier! Your task in this problem is to determine how to represent these puzzles using propositional logic, such that an AI running a model-checking algorithm could solve these puzzles for us.
 
 ## Getting Started
-
-- Download the distribution code from https://cdn.cs50.net/ai/2023/x/projects/0/tictactoe.zip and unzip it.
-- Once in the directory for the project, run pip3 install -r requirements.txt to install the required Python package (pygame) for this project.
+- Download the distribution code from https://cdn.cs50.net/ai/2023/x/projects/1/knights.zip and unzip it.
 
 ## Understanding
 
-There are two main files in this project: runner.py and tictactoe.py. tictactoe.py contains all of the logic for playing the game, and for making optimal moves. runner.py has been implemented for you, and contains all of the code to run the graphical interface for the game. Once you’ve completed all the required functions in tictactoe.py, you should be able to run python runner.py to play against your AI!
+Take a look at logic.py, which you may recall from Lecture 1. No need to understand everything in this file, but notice that this file defines several classes for different types of logical connectives. These classes can be composed within each other, so an expression like And(Not(A), Or(B, C)) represents the logical sentence stating that symbol A is not true, and that symbol B or symbol C is true (where “or” here refers to inclusive, not exclusive, or).
 
-Let’s open up tictactoe.py to get an understanding for what’s provided. First, we define three variables: X, O, and EMPTY, to represent possible moves of the board.
+Recall that logic.py also contains a function model_check. model_check takes a knowledge base and a query. The knowledge base is a single logical sentence: if multiple logical sentences are known, they can be joined together in an And expression. model_check recursively considers all possible models, and returns True if the knowledge base entails the query, and returns False otherwise.
 
-The function initial_state returns the starting state of the board. For this problem, we’ve chosen to represent the board as a list of three lists (representing the three rows of the board), where each internal list contains three values that are either X, O, or EMPTY. What follows are functions that we’ve left up to you to implement!
+Now, take a look at puzzle.py. At the top, we’ve defined six propositional symbols. AKnight, for example, represents the sentence that “A is a knight,” while AKnave represents the sentence that “A is a knave.” We’ve similarly defined propositional symbols for characters B and C as well.
+
+What follows are four different knowledge bases, knowledge0, knowledge1, knowledge2, and knowledge3, which will contain the knowledge needed to deduce the solutions to the upcoming Puzzles 0, 1, 2, and 3, respectively. Notice that, for now, each of these knowledge bases is empty. That’s where you come in!
+
+The main function of this puzzle.py loops over all puzzles, and uses model checking to compute, given the knowledge for that puzzle, whether each character is a knight or a knave, printing out any conclusions that the model checking algorithm is able to make.
 
 ## Specification
-Complete the implementations of player, actions, result, winner, terminal, utility, and minimax.
+Add knowledge to knowledge bases knowledge0, knowledge1, knowledge2, and knowledge3 to solve the following puzzles.
 
-- The player function should take a board state as input, and return which player’s turn it is (either X or O).
-  - In the initial game state, X gets the first move. Subsequently, the player alternates with each additional move.
-  - Any return value is acceptable if a terminal board is provided as input (i.e., the game is already over).
-- The actions function should return a set of all of the possible actions that can be taken on a given board.
-  - Each action should be represented as a tuple (i, j) where i corresponds to the row of the move (0, 1, or 2) and j corresponds to which cell in the row corresponds to the move (also 0, 1, or 2).
-  - Possible moves are any cells on the board that do not already have an X or an O in them.
-  - Any return value is acceptable if a terminal board is provided as input.
-- The result function takes a board and an action as input, and should return a new board state, without modifying the original board.
-  - If action is not a valid action for the board, your program should raise an exception.
-  - The returned board state should be the board that would result from taking the original input board, and letting the player whose turn it is make their move at the cell indicated by the input action.
-  - Importantly, the original board should be left unmodified: since Minimax will ultimately require considering many different board states during its computation. This means that simply updating a cell in board itself is not a correct implementation of the result function. You’ll likely want to make a deep copy of the board first before making any changes.
-- The winner function should accept a board as input, and return the winner of the board if there is one.
-  - If the X player has won the game, your function should return X. If the O player has won the game, your function should return O.
-  - One can win the game with three of their moves in a row horizontally, vertically, or diagonally.
-  - You may assume that there will be at most one winner (that is, no board will ever have both players with three-in-a-row, since that would be an invalid board state).
-  - If there is no winner of the game (either because the game is in progress, or because it ended in a tie), the function should return None.
-- The terminal function should accept a board as input, and return a boolean value indicating whether the game is over.
-  - If the game is over, either because someone has won the game or because all cells have been filled without anyone winning, the function should return True.
-  - Otherwise, the function should return False if the game is still in progress.
-- The utility function should accept a terminal board as input and output the utility of the board.
-  - If X has won the game, the utility is 1. If O has won the game, the utility is -1. If the game has ended in a tie, the utility is 0.
-  - You may assume utility will only be called on a board if terminal(board) is True.
-- The minimax function should take a board as input, and return the optimal move for the player to move on that board.
-  - The move returned should be the optimal action (i, j) that is one of the allowable actions on the board. If multiple moves are equally optimal, any of those moves is acceptable.
-  - If the board is a terminal board, the minimax function should return None.
+- Puzzle 0 is the puzzle from the Background. It contains a single character, A.
+  - A says “I am both a knight and a knave.”
+- Puzzle 1 has two characters: A and B.
+  - A says “We are both knaves.”
+  - B says nothing.
+- Puzzle 2 has two characters: A and B.
+  - A says “We are the same kind.”
+  - B says “We are of different kinds.”
+- Puzzle 3 has three characters: A, B, and C.
+  - A says either “I am a knight.” or “I am a knave.”, but you don’t know which.
+  - B says “A said ‘I am a knave.’”
+  - B then says “C is a knave.”
+  - C says “A is a knight.”
 
-For all functions that accept a board as input, you may assume that it is a valid board (namely, that it is a list that contains three rows, each with three values of either X, O, or EMPTY). You should not modify the function declarations (the order or number of arguments to each function) provided.
+In each of the above puzzles, each character is either a knight or a knave. Every sentence spoken by a knight is true, and every sentence spoken by a knave is false.
 
-Once all functions are implemented correctly, you should be able to run python runner.py and play against your AI. And, since Tic-Tac-Toe is a tie given optimal play by both sides, you should never be able to beat the AI (though if you don’t play optimally as well, it may beat you!)
+Once you’ve completed the knowledge base for a problem, you should be able to run python puzzle.py to see the solution to the puzzle.
