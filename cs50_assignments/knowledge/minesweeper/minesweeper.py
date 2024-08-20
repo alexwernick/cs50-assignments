@@ -1,4 +1,3 @@
-# import itertools
 import random
 
 
@@ -210,10 +209,21 @@ class MinesweeperAI:
         self.mark_safe(cell)
 
         neighboring_cells = self._get_neighboring_cells(cell)
-        sentence = Sentence(neighboring_cells, count)
+        neighboring_cells_without_known_mines = neighboring_cells - self.mines
+        count -= len(neighboring_cells) - len(neighboring_cells_without_known_mines)
+        neighboring_cells_without_known_mines_and_safes = (
+            neighboring_cells_without_known_mines - self.safes
+        )
+        sentence = Sentence(neighboring_cells_without_known_mines_and_safes, count)
         self.knowledge.append(sentence)
-        self._recursively_update_known_mines_and_safes()
-        self._recursively_infer_new_sentences_from_knowledge()
+
+        keep_recursing = True
+
+        while keep_recursing:
+            keep_recursing = (
+                self._recursively_update_known_mines_and_safes()
+                or self._recursively_infer_new_sentences_from_knowledge()
+            )
 
     def make_safe_move(self):
         """
@@ -266,15 +276,18 @@ class MinesweeperAI:
         Recursively goes through knowledge and marks
         safes and mines accordingly
         """
+        found_new_information = False
         while True:
             infered_safes = set()
             infered_mines = set()
             for sentence in self.knowledge:
-                infered_safes = sentence.known_safes() - self.safes
-                infered_mines = sentence.known_mines() - self.mines
+                infered_safes.update(sentence.known_safes() - self.safes)
+                infered_mines.update(sentence.known_mines() - self.mines)
 
             if len(infered_safes) == 0 and len(infered_mines) == 0:
-                return
+                return found_new_information
+
+            found_new_information = True
 
             for inferred_safe in infered_safes:
                 self.mark_safe(inferred_safe)
@@ -287,6 +300,8 @@ class MinesweeperAI:
         Recursively goes through knowledge and
         generates new knowledge
         """
+        found_new_information = False
+
         while True:
             infered_sentences = []
             for sentence1 in self.knowledge:
@@ -309,8 +324,9 @@ class MinesweeperAI:
                         continue
 
             if len(infered_sentences) == 0:
-                return
+                return found_new_information
 
+            found_new_information = True
             for inferred_sentence in infered_sentences:
                 self.knowledge.append(inferred_sentence)
 
