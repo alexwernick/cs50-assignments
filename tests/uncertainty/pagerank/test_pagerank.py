@@ -76,7 +76,7 @@ def test_iterate_pagerank_probabilities_sum_to_1():
     corpus = {
         "1.html": {"2.html", "3.html"},
         "2.html": {"3.html"},
-        "3.html": {"2.html"},
+        "3.html": {},
     }
     damping_factor = 0.85
     result = iterate_pagerank(corpus, damping_factor)

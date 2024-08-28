@@ -108,6 +108,13 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
+
+    # make correction if there is a page with no links
+    # we need to make page link to all pages including itself
+    for linking_page, linking_page_pages in corpus.items():
+        if len(linking_page_pages) == 0:
+            corpus[linking_page] = corpus.keys()
+
     tolerance = 0.001
     n = len(corpus)
     p_of_random_selection = (1 - damping_factor) / n
