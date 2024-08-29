@@ -1,6 +1,7 @@
 import csv
 import itertools
 import sys
+from pathlib import Path
 
 PROBS = {
     # Unconditional probabilities for having gene
@@ -22,7 +23,9 @@ def main():
     # Check for proper usage
     if len(sys.argv) != 2:
         sys.exit("Usage: python heredity.py data.csv")
-    people = load_data(sys.argv[1])
+
+    dir = Path(__file__).parent / sys.argv[1]
+    people = load_data(dir)
 
     # Keep track of gene and trait probabilities for each person
     probabilities = {
@@ -115,7 +118,33 @@ def joint_probability(people, one_gene, two_genes, have_trait):
         * everyone in set `have_trait` has the trait, and
         * everyone not in set` have_trait` does not have the trait.
     """
-    raise NotImplementedError
+
+    # will code without validating here to keep things simple but
+    # in a production program we should code more defensively
+    joint_probability = 1.0
+
+    for person in people:
+        number_of_genes = _resolve_number_of_genes(person, one_gene, two_genes)
+        is_trait = person in have_trait
+        # we only consider in this code the case of both parents
+        # we do not consider where one parent is known
+        mum = people[person]["mother"]
+        dad = people[person]["father"]
+        has_parents = mum is not None and dad is not None
+        prob_number_of_genes = None
+
+        if has_parents:
+            prob_number_of_genes = _prob_number_of_genes_given_parents(
+                dad, mum, one_gene, two_genes, number_of_genes
+            )
+        else:
+            prob_number_of_genes = PROBS["gene"][number_of_genes]
+
+        joint_probability *= (
+            prob_number_of_genes * PROBS["trait"][number_of_genes][is_trait]
+        )
+
+    return joint_probability
 
 
 def update(probabilities, one_gene, two_genes, have_trait, p):
@@ -125,7 +154,11 @@ def update(probabilities, one_gene, two_genes, have_trait, p):
     Which value for each distribution is updated depends on whether
     the person is in `have_gene` and `have_trait`, respectively.
     """
-    raise NotImplementedError
+    for person in probabilities:
+        number_of_genes = _resolve_number_of_genes(person, one_gene, two_genes)
+        is_trait = person in have_trait
+        probabilities[person]["gene"][number_of_genes] += p
+        probabilities[person]["trait"][is_trait] += p
 
 
 def normalize(probabilities):
@@ -133,7 +166,64 @@ def normalize(probabilities):
     Update `probabilities` such that each probability distribution
     is normalized (i.e., sums to 1, with relative proportions the same).
     """
-    raise NotImplementedError
+    for person in probabilities:
+        sum_of_gene_ps = (
+            probabilities[person]["gene"][0]
+            + probabilities[person]["gene"][1]
+            + probabilities[person]["gene"][2]
+        )
+        sum_of_trait_ps = (
+            probabilities[person]["trait"][True] + probabilities[person]["trait"][False]
+        )
+
+        probabilities[person]["gene"][0] = (
+            probabilities[person]["gene"][0] / sum_of_gene_ps
+        )
+        probabilities[person]["gene"][1] = (
+            probabilities[person]["gene"][1] / sum_of_gene_ps
+        )
+        probabilities[person]["gene"][2] = (
+            probabilities[person]["gene"][2] / sum_of_gene_ps
+        )
+
+        probabilities[person]["trait"][True] = (
+            probabilities[person]["trait"][True] / sum_of_trait_ps
+        )
+        probabilities[person]["trait"][False] = (
+            probabilities[person]["trait"][False] / sum_of_trait_ps
+        )
+
+
+def _p_of_gene_given_parent_num(num_genes_in_parent):
+    if num_genes_in_parent == 2:
+        return 1 - PROBS["mutation"]
+    elif num_genes_in_parent == 1:
+        return 0.5 * (1 - PROBS["mutation"]) + 0.5 * PROBS["mutation"]
+    else:
+        return PROBS["mutation"]
+
+
+def _resolve_number_of_genes(person, one_gene, two_genes):
+    is_one = person in one_gene
+    is_two = person in two_genes
+    return 1 if is_one else (2 if is_two else 0)
+
+
+def _prob_number_of_genes_given_parents(dad, mum, one_gene, two_genes, number_of_genes):
+    number_of_genes_in_dad = _resolve_number_of_genes(dad, one_gene, two_genes)
+    p_gene_from_dad = _p_of_gene_given_parent_num(number_of_genes_in_dad)
+    number_of_genes_in_mum = _resolve_number_of_genes(mum, one_gene, two_genes)
+    p_gene_from_mum = _p_of_gene_given_parent_num(number_of_genes_in_mum)
+
+    if number_of_genes == 2:
+        return p_gene_from_dad * p_gene_from_mum
+    elif number_of_genes == 1:
+        return (
+            p_gene_from_dad * (1 - p_gene_from_mum)
+            + (1 - p_gene_from_dad) * p_gene_from_mum
+        )
+    else:
+        return (1 - p_gene_from_mum) * (1 - p_gene_from_dad)
 
 
 if __name__ == "__main__":
