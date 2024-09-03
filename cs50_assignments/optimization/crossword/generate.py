@@ -2,7 +2,7 @@ import copy
 import sys
 from pathlib import Path
 
-from cs50_assignments.optimization.crossword.crossword import Crossword, Variable
+from crossword import Crossword, Variable
 
 
 class CrosswordCreator:
@@ -95,7 +95,7 @@ class CrosswordCreator:
         """
         self.enforce_node_consistency()
         self.ac3()
-        return self.backtrack({key: None for key in self.domains})
+        return self.backtrack(dict())
 
     def enforce_node_consistency(self):
         """
@@ -161,8 +161,8 @@ class CrosswordCreator:
         Return True if `assignment` is complete (i.e., assigns a value to each
         crossword variable); return False otherwise.
         """
-        for word in assignment.values():
-            if word is None:
+        for variable in self.domains:
+            if variable not in assignment:
                 return False
 
         return True
@@ -174,19 +174,15 @@ class CrosswordCreator:
         """
 
         # values not distinct
-        non_none_values = [item for item in assignment.values() if item is not None]
-        if len(non_none_values) != len(set(non_none_values)):
+        if len(assignment) != len(set(assignment)):
             return False
 
         for variable, word in assignment.items():
-            if word is None:
-                continue
-
             if len(word) != variable.length:
                 return False
 
             for neighbor in self.crossword.neighbors(variable):
-                if assignment[neighbor] is None:
+                if neighbor not in assignment:
                     continue
 
                 overlap = self.crossword.overlaps[variable, neighbor]
@@ -206,7 +202,7 @@ class CrosswordCreator:
         for value in self.domains[var]:
             words_ruled_out = 0
             for neighbor in self.crossword.neighbors(var):
-                if assignment[neighbor] is not None:
+                if neighbor in assignment:
                     continue
 
                 overlap = self.crossword.overlaps[var, neighbor]
@@ -227,7 +223,7 @@ class CrosswordCreator:
         return values.
         """
         unassigned_variables = [
-            variable for variable in assignment if assignment[variable] is None
+            variable for variable in self.domains if variable not in assignment
         ]
         variable_domain_sizes = [
             (variable, len(self.domains[variable])) for variable in unassigned_variables
@@ -268,7 +264,8 @@ class CrosswordCreator:
         variable = self.select_unassigned_variable(assignment)
         for value in self.order_domain_values(variable, assignment):
             # make assignment
-            deep_copy = copy.deepcopy(assignment)
+            deep_copy_assignment = copy.deepcopy(assignment)
+            deep_copy_domains = copy.deepcopy(self.domains)
             assignment[variable] = value
             if self.consistent(assignment):
                 arcs = set()
@@ -278,7 +275,9 @@ class CrosswordCreator:
                 if self.ac3(arcs) and self.backtrack(assignment):
                     return assignment
 
-            assignment = deep_copy
+            assignment = deep_copy_assignment
+            self.domains = deep_copy_domains
+
         return None
 
     def _contains_word_with_letter(_, words, index, letter):
@@ -290,8 +289,8 @@ class CrosswordCreator:
 
 def main():
     # Set defaults
-    structure = Path(__file__).parent / "data/structure1.txt"
-    words = Path(__file__).parent / "data/words1.txt"
+    structure = Path(__file__).parent / "data/structure0.txt"
+    words = Path(__file__).parent / "data/words0.txt"
     output = None
 
     # Parse command-line arguments
