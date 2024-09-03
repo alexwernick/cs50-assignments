@@ -2,7 +2,7 @@ import copy
 import sys
 from pathlib import Path
 
-from crossword import Crossword, Variable
+from cs50_assignments.optimization.crossword.crossword import Crossword, Variable
 
 
 class CrosswordCreator:
