@@ -152,7 +152,7 @@ class CrosswordCreator:
                 if len(self.domains[arc[0]]) == 0:
                     return False
                 for neighbor in self.crossword.neighbors(arc[0]):
-                    arcs.add((arc[0], neighbor))
+                    arcs.add((neighbor, arc[0]))
 
         return True
 
