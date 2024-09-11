@@ -168,4 +168,4 @@ cython_debug/
 *.code-workspace
 
 # Ignore large dataset
-cs50_assignments/neural_networks/traffic/gtsrb_1
+cs50_assignments/neural_networks/traffic/gtsrb
