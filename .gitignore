@@ -169,3 +169,6 @@ cython_debug/
 
 # Ignore large dataset
 cs50_assignments/neural_networks/traffic/gtsrb
+
+# Ignore output images
+cs50_assignments/language/attention/attention_diagrams/
