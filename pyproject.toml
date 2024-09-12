@@ -12,6 +12,7 @@ pillow = "^10.4.0"
 scikit-learn = "^1.5.1"
 opencv-python = "^4.10.0.84"
 nltk = "^3.9.1"
+transformers = "^4.44.2"
 
 
 [tool.poetry.group.dev.dependencies]
