@@ -17,10 +17,6 @@ APPLY_FIXED_KERNAL_TO_IMAGE = False
 
 
 def main():
-    # Check command-line arguments
-    # if len(sys.argv) not in [2, 3]:
-    #      sys.exit("Usage: python traffic.py data_directory [model.h5]")
-
     # Get image arrays and labels for all image files
     dir = os.path.join(
         Path(__file__).parent, "gtsrb" if len(sys.argv) < 2 else sys.argv[1]
