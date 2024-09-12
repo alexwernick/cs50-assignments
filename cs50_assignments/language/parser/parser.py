@@ -39,7 +39,6 @@ def main():
         s = input("Sentence: ")
 
     # Convert input into list of words
-    nltk.download("punkt_tab")
     s = preprocess(s)
 
     # Attempt to parse sentence
@@ -68,6 +67,7 @@ def preprocess(sentence):
     and removing any word that does not contain at least one alphabetic
     character.
     """
+    nltk.download("punkt_tab")
     tokens = nltk.word_tokenize(sentence)
     words = [word.lower() for word in tokens if any(c.isalpha() for c in word)]
     return words
