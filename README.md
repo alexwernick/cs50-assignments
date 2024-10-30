@@ -1,0 +1,2 @@
+# cs50-assignments
+This repo contains the completed assignments carried out during the course [CS50's Introduction to Artificial Intelligence with Python](https://cs50.harvard.edu/ai/2024/). Simply navigate to the modules assignents in this directory [cs50_assignments/](cs50_assignments/). Each folder in that directory contains one or more assignments which all contain their own respective READMEs
